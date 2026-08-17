@@ -17,7 +17,7 @@ Covers connection leases, name normalization, Position state machine, stale-slot
 4. `tools\Test-ProxySingleClient.ps1` — expect `Position = -1` then target; getter under 100 ms.
 5. `tools\Test-ProxyMultiClient.ps1` — both processes see `-1` then target; one physical move.
 6. ConformU full FilterWheel run against `ASCOM.SnowFlakeProxy.FilterWheel`. Save report under `docs\ConformU\`.
-7. NINA only, SkyGuard only, then both. Choose **Wanderer Snowflake Filter Wheel 1 Proxy**, not the vendor driver and not JustAHub.
+7. NINA only, SkyGuard only, then both. Choose **Wanderer Snowflake Filter Wheel 1 (Proxy)**, not the vendor driver and not JustAHub.
 
 ## NINA / SkyGuard checklist
 

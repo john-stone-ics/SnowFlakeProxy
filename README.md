@@ -9,7 +9,7 @@ It exists to hide two Wanderer-driver defects:
 
 ## Chooser name
 
-**Wanderer Snowflake Filter Wheel 1 Proxy**
+**Wanderer Snowflake Filter Wheel 1 (Proxy)**
 
 ProgID: `ASCOM.SnowFlakeProxy.FilterWheel`
 

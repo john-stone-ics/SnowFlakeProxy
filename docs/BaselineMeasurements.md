@@ -19,7 +19,7 @@ ASCOM Platform:    7.1
 Proxy public `Name` must therefore be:
 
 ```text
-Wanderer Snowflake Filter Wheel 1 Proxy
+Wanderer Snowflake Filter Wheel 1 (Proxy)
 ```
 
 ## Connected-session snapshot (wheel attached)

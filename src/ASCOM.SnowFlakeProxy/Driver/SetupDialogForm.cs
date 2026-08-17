@@ -114,7 +114,7 @@ namespace ASCOM.SnowFlakeProxy
             MinimizeBox = false;
             Name = "SetupDialogForm";
             StartPosition = FormStartPosition.CenterParent;
-            Text = "Wanderer Snowflake Filter Wheel 1 Proxy Setup";
+            Text = "Wanderer Snowflake Filter Wheel 1 (Proxy) Setup";
             AcceptButton = cmd_ok;
             CancelButton = cmd_cancel;
             ResumeLayout(false);

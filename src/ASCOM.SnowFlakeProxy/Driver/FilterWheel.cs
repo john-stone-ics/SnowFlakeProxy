@@ -13,7 +13,7 @@ namespace ASCOM.SnowFlakeProxy
     [ComVisible(true)]
     [Guid("5A253603-5EBC-4667-9041-F24445724985")]
     [ProgId("ASCOM.SnowFlakeProxy.FilterWheel")]
-    [ServedClassName("Wanderer Snowflake Filter Wheel 1 Proxy")]
+    [ServedClassName("Wanderer Snowflake Filter Wheel 1 (Proxy)")]
     [ClassInterface(ClassInterfaceType.None)]
     public class FilterWheel : ReferenceCountedObjectBase, IFilterWheelV3, IDisposable
     {

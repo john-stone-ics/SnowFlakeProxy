@@ -1,0 +1,11 @@
+This installs the ASCOM FilterWheel LocalServer:
+
+    Wanderer Snowflake Filter Wheel 1 (Proxy)
+
+After setup, choose that name in NINA and SkyGuard. Do not choose the
+vendor driver "Wanderer Snowflake Filter Wheel 1", and do not put
+JustAHub in the path.
+
+The proxy talks to the installed Wanderer driver. The Snowflake must be
+attached to this PC, and nothing else may connect to the vendor ProgID
+while the proxy is running.

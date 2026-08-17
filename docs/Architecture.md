@@ -36,7 +36,7 @@ There is exactly one vendor COM object. It is created, used, and disposed only o
 ## Identity
 
 - Proxy ProgID: `ASCOM.SnowFlakeProxy.FilterWheel`
-- Proxy Name: `Wanderer Snowflake Filter Wheel 1 Proxy`
+- Proxy Name: `Wanderer Snowflake Filter Wheel 1 (Proxy)`
 - Vendor ProgID: `ASCOM.WandererSnowflakeFilterWheel1.FilterWheel`
 - Vendor Name: `Wanderer Snowflake Filter Wheel 1`
 

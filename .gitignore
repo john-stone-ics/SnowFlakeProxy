@@ -12,3 +12,4 @@ _template/
 docs/ConformU/*.html
 docs/ConformU/*.txt
 !docs/ConformU/.gitkeep
+dist/

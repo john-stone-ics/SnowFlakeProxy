@@ -1,17 +1,30 @@
 # Requires Windows PowerShell 5.1
 # Two-process multi-client integration test for ASCOM.SnowFlakeProxy.FilterWheel
+#
+# Writes each client to a temp .ps1 and launches it with -File so format
+# strings keep their quotes (Start-Process -Command strips them).
 
 $ErrorActionPreference = "Stop"
-$prog_id = "ASCOM.SnowFlakeProxy.FilterWheel"
-$root = Split-Path -Parent $PSScriptRoot
+$ps = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
 $log_dir = Join-Path $env:TEMP "SnowFlakeProxyMultiClient"
 New-Item -ItemType Directory -Path $log_dir -Force | Out-Null
-$client_a_log = Join-Path $log_dir "client-a.log"
-$client_b_log = Join-Path $log_dir "client-b.log"
-Remove-Item $client_a_log -ErrorAction SilentlyContinue
-Remove-Item $client_b_log -ErrorAction SilentlyContinue
 
-$client_a = @'
+$client_a_ps1 = Join-Path $log_dir "client-a.ps1"
+$client_b_ps1 = Join-Path $log_dir "client-b.ps1"
+$client_a_log = Join-Path $log_dir "client-a.log"
+$client_a_err = Join-Path $log_dir "client-a.err"
+$client_b_log = Join-Path $log_dir "client-b.log"
+$client_b_err = Join-Path $log_dir "client-b.err"
+
+@(
+    $client_a_log, $client_a_err, $client_b_log, $client_b_err
+) | ForEach-Object {
+    if (Test-Path $_) {
+        Remove-Item $_ -Force
+    }
+}
+
+Set-Content -Path $client_a_ps1 -Encoding ASCII -Value @'
 $ErrorActionPreference = "Stop"
 $prog_id = "ASCOM.SnowFlakeProxy.FilterWheel"
 $fw = New-Object -ComObject $prog_id
@@ -22,7 +35,8 @@ try {
         $sw = [Diagnostics.Stopwatch]::StartNew()
         $p = $fw.Position
         $sw.Stop()
-        Write-Output ("{0:HH:mm:ss.fff} Position={1} getter={2}ms" -f [DateTime]::Now, $p, $sw.ElapsedMilliseconds)
+        $line = "{0:HH:mm:ss.fff} Position={1} getter={2}ms" -f [DateTime]::Now, $p, $sw.ElapsedMilliseconds
+        Write-Output $line
         Start-Sleep -Milliseconds 100
     }
 }
@@ -34,28 +48,36 @@ finally {
 }
 '@
 
-$client_b = @'
+Set-Content -Path $client_b_ps1 -Encoding ASCII -Value @'
 $ErrorActionPreference = "Stop"
 $prog_id = "ASCOM.SnowFlakeProxy.FilterWheel"
 Start-Sleep -Seconds 2
 $fw = New-Object -ComObject $prog_id
 try {
     $fw.Connected = $true
-    $start = $fw.Position
+    $start = [int]$fw.Position
+    $names = @($fw.Names)
     $target = $start + 1
-    if ($target -ge @($fw.Names).Length) { $target = 0 }
-    Write-Output ("{0:HH:mm:ss.fff} command Position={1} from {2}" -f [DateTime]::Now, $target, $start)
+    if ($target -ge $names.Length) {
+        $target = 0
+    }
+    $line = "{0:HH:mm:ss.fff} command Position={1} from {2}" -f [DateTime]::Now, $target, $start
+    Write-Output $line
     $set_sw = [Diagnostics.Stopwatch]::StartNew()
-    $fw.Position = $target
+    $fw.Position = [int16]$target
     $set_sw.Stop()
-    Write-Output ("{0:HH:mm:ss.fff} setter returned after {1} ms" -f [DateTime]::Now, $set_sw.ElapsedMilliseconds)
+    $line = "{0:HH:mm:ss.fff} setter returned after {1} ms" -f [DateTime]::Now, $set_sw.ElapsedMilliseconds
+    Write-Output $line
     $end = [DateTime]::UtcNow.AddSeconds(40)
     while ([DateTime]::UtcNow -lt $end) {
         $sw = [Diagnostics.Stopwatch]::StartNew()
         $p = $fw.Position
         $sw.Stop()
-        Write-Output ("{0:HH:mm:ss.fff} Position={1} getter={2}ms" -f [DateTime]::Now, $p, $sw.ElapsedMilliseconds)
-        if ($p -eq $target) { break }
+        $line = "{0:HH:mm:ss.fff} Position={1} getter={2}ms" -f [DateTime]::Now, $p, $sw.ElapsedMilliseconds
+        Write-Output $line
+        if ($p -eq $target) {
+            break
+        }
         Start-Sleep -Milliseconds 100
     }
 }
@@ -67,13 +89,18 @@ finally {
 }
 '@
 
-$ps = "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-$proc_a = Start-Process -FilePath $ps -ArgumentList @("-NoProfile", "-Command", $client_a) -RedirectStandardOutput $client_a_log -NoNewWindow -PassThru
-$proc_b = Start-Process -FilePath $ps -ArgumentList @("-NoProfile", "-Command", $client_b) -RedirectStandardOutput $client_b_log -NoNewWindow -PassThru
-Wait-Process -Id $proc_a.Id, $proc_b.Id -Timeout 90
+$proc_a = Start-Process -FilePath $ps -ArgumentList @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $client_a_ps1) -RedirectStandardOutput $client_a_log -RedirectStandardError $client_a_err -NoNewWindow -PassThru
+Start-Sleep -Milliseconds 500
+$proc_b = Start-Process -FilePath $ps -ArgumentList @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $client_b_ps1) -RedirectStandardOutput $client_b_log -RedirectStandardError $client_b_err -NoNewWindow -PassThru
 
-Write-Host "==== Client A ===="
-Get-Content $client_a_log
-Write-Host "==== Client B ===="
-Get-Content $client_b_log
+Wait-Process -Id @($proc_a.Id, $proc_b.Id) -Timeout 90 -ErrorAction SilentlyContinue
+
+Write-Host "==== Client A stdout ===="
+if (Test-Path $client_a_log) { Get-Content $client_a_log }
+Write-Host "==== Client A stderr ===="
+if (Test-Path $client_a_err) { Get-Content $client_a_err }
+Write-Host "==== Client B stdout ===="
+if (Test-Path $client_b_log) { Get-Content $client_b_log }
+Write-Host "==== Client B stderr ===="
+if (Test-Path $client_b_err) { Get-Content $client_b_err }
 Write-Host ("Logs: {0}" -f $log_dir)
