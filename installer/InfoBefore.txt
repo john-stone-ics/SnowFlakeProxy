@@ -1,0 +1,18 @@
+This installs the ASCOM FilterWheel LocalServer SnowFlakeProxy.
+
+Chooser will list three entries, matching Wanderer's three slots:
+
+    Wanderer Snowflake Filter Wheel 1 (Proxy)
+    Wanderer Snowflake Filter Wheel 2 (Proxy)
+    Wanderer Snowflake Filter Wheel 3 (Proxy)
+
+In NINA and SkyGuard, pick the proxy whose number matches the Wanderer
+slot that owns that wheel. Do not choose the vendor driver, and do not
+put JustAHub in the path.
+
+Each proxy talks only to its matching Wanderer ProgID. Nothing else may
+connect to that vendor ProgID while the proxy is running.
+
+Slot 1's ProgID is ASCOM.SnowFlakeProxy1.FilterWheel. An older
+unnumbered ASCOM.SnowFlakeProxy.FilterWheel entry is migrated away
+on install; re-select the proxy in NINA or SkyGuard if needed.

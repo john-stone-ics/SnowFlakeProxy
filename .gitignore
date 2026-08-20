@@ -1,0 +1,15 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.cache
+TestResults/
+_template/
+*.vsix
+*.zip
+*.pub
+docs/ConformU/*.html
+docs/ConformU/*.txt
+!docs/ConformU/.gitkeep
+dist/
